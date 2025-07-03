@@ -36,20 +36,33 @@ namespace FindSecretDoc
                 return;
             }*/
 
+            var driveName = DriveInfo.GetDrives();
+            List<string> listFilesOut = new List<string>();
             OperationFiles.searchPattern = "Secretno"; //Переделать на внешний ввод из файла
-            var listFiles = EnumerateFiles("C:\\");
+
+            foreach (var drive in driveName) 
+            {
+                var listFiles = (EnumerateFiles(drive.Name));
+
+                foreach (var item in listFiles)
+                {
+                    listFilesOut.Add(item);
+                }
+
+            }
+
             Console.SetCursorPosition(0, 3);
             Console.Write(new string(' ', SafeEnumerateFiles.LeghtConsole));
             Console.SetCursorPosition(0, 3);
-            if (listFiles != null)
+            if (listFilesOut != null)
             {
-                Console.WriteLine("Найдено файлов: " + listFiles.Count.ToString());
+                Console.WriteLine("Найдено файлов: " + listFilesOut.Count.ToString());
             }
             else
             {
                 Console.WriteLine("Файлы не найдены");
             }
-            foreach (var item in listFiles)
+            foreach (var item in listFilesOut)
             {
                 Console.WriteLine(item.ToString());
             }
