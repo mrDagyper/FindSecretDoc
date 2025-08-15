@@ -1,46 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.WebRequestMethods;
 
 namespace FindSecretDoc
 {
     internal class Program
     {
-        
+
 
         static void Main()
         {
             Console.WriteLine("Программа для поиска файлов по названию и содержимому");
             Console.WriteLine("----------------------------------------------------");
 
-           /*
-            // Проверка существования директории
-            if (!Directory.Exists(directoryPath))
-            {
-                Console.WriteLine("Указанная директория не существует!");
-                Console.ReadKey();
-                return;
-            }
-           */
             Console.WriteLine("Идет поиск соответствий. Ожидайте результата.");
-            /*
-            // Проверка, что хотя бы один критерий поиска задан
-            if (string.IsNullOrWhiteSpace(fileNameQuery) && string.IsNullOrWhiteSpace(contentQuery))
-            {
-                Console.WriteLine("Не задано ни одного критерия поиска!");
-                return;
-            }*/
 
             var driveName = DriveInfo.GetDrives();
             List<string> listFilesOut = new List<string>();
             OperationFiles.searchPattern = "Secretno"; //Переделать на внешний ввод из файла
 
-            foreach (var drive in driveName) 
+            foreach (var drive in driveName)
             {
                 var listFiles = (EnumerateFiles(drive.Name));
 
@@ -84,14 +63,14 @@ namespace FindSecretDoc
             {
                 foreach (var subDirPath in files)
                 {
-                        matchFiles.Add(subDirPath.FullName);
+                    matchFiles.Add(subDirPath.FullName);
                 }
             }
             catch (Exception)
             {
                 Console.WriteLine("DirectoryNotFoundException");
             }
-               
+
             return matchFiles;
         }
     }

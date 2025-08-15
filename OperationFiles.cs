@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace FindSecretDoc
 {
@@ -21,41 +18,35 @@ namespace FindSecretDoc
         public static IEnumerable<FileInfo> GetAllFiles(IEnumerable<FileInfo> DirectionPath)
         {
             var matchFiles = Enumerable.Empty<FileInfo>();
-
+            MatchingName matching = new MatchingName(searchPattern);
             foreach (var filePath in DirectionPath)
             {
-                if (MatchingName(filePath.FullName, searchPattern) != null)
-                    matchFiles = matchFiles.Concat(new[] { filePath });
+                if (filePath.Exists)
+                {
+                    if (matching.FindMatchingInName(filePath.FullName))
+                        matchFiles = matchFiles.Concat(new[] { filePath });
 
-                if (MatchingContent(filePath.FullName, searchPattern) != null)
-                    matchFiles = matchFiles.Concat(new[] { filePath });
+
+                    if (filePath.Extension == ".docx")
+                    {
+                        using (MatchingContent matchingContent = new MatchingContent(filePath.FullName, searchPattern))
+                        {
+                            if (matchingContent.MatchingContentForDocx())
+                                matchFiles = matchFiles.Concat(new[] { filePath });
+                        }
+                    }
+                    else
+                    {
+                        if (MatchingContent(filePath.FullName, searchPattern) != null)
+                            matchFiles = matchFiles.Concat(new[] { filePath });
+                    }
+
+                }
             }
             return matchFiles;
         }
 
-        /// <summary>
-        /// Поиск соответствий в названии файла
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="searchPattern"></param>
-        /// <returns></returns>
-        private static string MatchingName(string path, string searchPattern)
-        {
-            if (!string.IsNullOrWhiteSpace(searchPattern))
-            {
-                try
-                {
-                    bool nameMatch = path.IndexOf(searchPattern, StringComparison.OrdinalIgnoreCase) >= 0;
-                    if (nameMatch)
-                        return path;
-                }
-                catch (Exception)
-                {
-                    return null;
-                }
-            }
-            return null;
-        }
+
 
         /// <summary>
         /// Поиск соответствий в содержании файла
@@ -69,7 +60,7 @@ namespace FindSecretDoc
             {
                 try
                 {
-                    string content = System.IO.File.ReadAllText(fileName, Encoding.UTF8);
+                    string content = System.IO.File.ReadAllText(fileName);
                     bool contentMatch = content.IndexOf(searchPattern, StringComparison.OrdinalIgnoreCase) >= 0;
                     if (contentMatch)
                         return fileName;
@@ -81,5 +72,9 @@ namespace FindSecretDoc
             }
             return null;
         }
+
+
+
+
     }
 }
