@@ -1,25 +1,25 @@
 ﻿using Microsoft.Office.Interop.Word;
 using System;
+using System.Text;
+//using BitMiracle.Docotic.Pdf;
+using System.IO;
+using Spire.Pdf;
+using Spire.Pdf.Texts;
+using System.Runtime.CompilerServices;
 
 namespace FindSecretDoc
 {
-    internal class MatchingContent : IDisposable
+    internal class MatchingContent
     {
-        private string FileName { get; set; }
         private string Content { get; set; }
 
-        private Application Application = new Application();
-        private Document Document = new Document();
-
-        private MatchingContent() { }
+        public MatchingContent() { }
         /// <summary>
         /// Поиск Соответствий в файлах
         /// </summary>
-        /// <param name="fileName">путь к файлу</param>
         /// <param name="content">строка для поиска соответствий</param>
-        public MatchingContent(string fileName, string content)
+        public MatchingContent(string content)
         {
-            FileName = fileName;
             Content = content;
         }
 
@@ -27,29 +27,64 @@ namespace FindSecretDoc
         /// Поиск соответствий в содержании файла docx
         /// </summary>
         /// <returns></returns>
-        public bool MatchingContentForDocx(/*string fileName, string searchPattern*/)
+        public bool MatchingContentForDocx(string fileName)
         {
             try
             {
-                Document = Application.Documents.Open(FileName, ReadOnly: true);
-                Boolean result = Document.Content.Text.IndexOf(Content, StringComparison.CurrentCultureIgnoreCase) >= 0;
-                Document.Close();
-                Application.Quit();
-
-                return result;
+                using (ProcessingMicrWordFile processingMicrWordFile = new ProcessingMicrWordFile(fileName, Content))
+                {
+                    
+                    return processingMicrWordFile.ProcessingDocxDoc().IndexOf(Content, StringComparison.OrdinalIgnoreCase) >= 0;
+                }
             }
             catch (Exception)
             {
                 return false;
             }
-
         }
 
-        public void Dispose()
+        /// <summary>
+        /// Поиск соответствий в содежаннии файлов остальных форматов
+        /// </summary>
+        public bool MatchingContentOtherText(string fileName)
         {
-            Application.Quit();
-            GC.SuppressFinalize(this);
+            if (!string.IsNullOrWhiteSpace(Content))
+            {
+                try
+                {
+                    string content = System.IO.File.ReadAllText(fileName);
+                    return content.IndexOf(Content, StringComparison.OrdinalIgnoreCase) >= 0;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+        return false;
         }
+
+        /// <summary>
+        /// Поиск соответствий в содежаннии файлов остальных форматов PDF
+        /// </summary>
+        /// <param name="text">Текст в котором необходимо провести поиск соответствий</param>
+        /// <returns></returns>
+        public bool MatchingContentOtherTextPDF(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                try
+                {
+                    return text.IndexOf(Content, StringComparison.OrdinalIgnoreCase) >= 0;
+                }
+                catch (Exception)
+                {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+      
     }
 }
 

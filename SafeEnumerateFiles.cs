@@ -61,6 +61,7 @@ namespace FindSecretDoc
                                                                                                (x.Extension.ToLower() == ".doc") ||
                                                                                                 (x.Extension.ToLower() == ".docx") ||
                                                                                                 (x.Extension.ToLower() == ".pdf") ||
+                                                                                               // (x.Extension.ToLower() == ".xml") || Раскоментить если есть в этом необходимость
                                                                                                 (x.Extension.ToLower() == ".rtf")));
             }
             catch (UnauthorizedAccessException)

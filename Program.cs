@@ -10,6 +10,11 @@ namespace FindSecretDoc
 
         static void Main()
         {
+            //*-------------------------ТЕСТ----------------------------------------
+            //MatchingContent matchingContent = new MatchingContent();
+            //matchingContent.MatchingContentForPDF(@"C:\MailUploader\Секретно.pdf");
+            //*=====================================================================
+
             Console.WriteLine("Программа для поиска файлов по названию и содержимому");
             Console.WriteLine("----------------------------------------------------");
 
