@@ -6,35 +6,36 @@ using System.IO;
 using Spire.Pdf;
 using Spire.Pdf.Texts;
 using System.Runtime.CompilerServices;
+using System.Web;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace FindSecretDoc
 {
     internal class MatchingContent
     {
-        private string Content { get; set; }
-
         public MatchingContent() { }
-        /// <summary>
-        /// Поиск Соответствий в файлах
-        /// </summary>
-        /// <param name="content">строка для поиска соответствий</param>
-        public MatchingContent(string content)
-        {
-            Content = content;
-        }
 
         /// <summary>
         /// Поиск соответствий в содержании файла docx
         /// </summary>
         /// <returns></returns>
-        public bool MatchingContentForDocx(string fileName)
+        public bool MatchingContentForDocx(string fileName, string[] content)
         {
             try
             {
-                using (ProcessingMicrWordFile processingMicrWordFile = new ProcessingMicrWordFile(fileName, Content))
+                using (ProcessingMicrWordFile processingMicrWordFile = new ProcessingMicrWordFile(fileName))
                 {
-                    
-                    return processingMicrWordFile.ProcessingDocxDoc().IndexOf(Content, StringComparison.OrdinalIgnoreCase) >= 0;
+                    bool result = false;
+                    var text = processingMicrWordFile.ProcessingDocxDoc();
+                    foreach (var item in content)
+                    {
+                        if (text.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            result = true;
+                            break;
+                        }
+                    }
+                    return result;
                 }
             }
             catch (Exception)
@@ -46,21 +47,28 @@ namespace FindSecretDoc
         /// <summary>
         /// Поиск соответствий в содежаннии файлов остальных форматов
         /// </summary>
-        public bool MatchingContentOtherText(string fileName)
+        public bool MatchingContentOtherText(string fileName, string[] content)
         {
-            if (!string.IsNullOrWhiteSpace(Content))
+            try
             {
-                try
+                string contentFile = System.IO.File.ReadAllText(fileName);
+                bool result = false;
+
+                foreach (var item in content)
                 {
-                    string content = System.IO.File.ReadAllText(fileName);
-                    return content.IndexOf(Content, StringComparison.OrdinalIgnoreCase) >= 0;
+                    if (contentFile.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        result = true;
+                        break;
+                    }
                 }
-                catch (Exception)
-                {
-                    return false;
-                }
+
+                return result;
             }
-        return false;
+            catch (Exception)
+            {
+                return false;
+            }
         }
 
         /// <summary>
@@ -68,13 +76,22 @@ namespace FindSecretDoc
         /// </summary>
         /// <param name="text">Текст в котором необходимо провести поиск соответствий</param>
         /// <returns></returns>
-        public bool MatchingContentOtherTextPDF(string text)
+        public bool MatchingContentOtherTextPDF(string text, string[] content)
         {
             if (!string.IsNullOrWhiteSpace(text))
             {
                 try
                 {
-                    return text.IndexOf(Content, StringComparison.OrdinalIgnoreCase) >= 0;
+                    bool result = false; 
+                    foreach (var item in content) 
+                    {
+                        if (text.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
+                        {
+                            result = true;
+                            break;
+                        }
+                    }
+                    return result;
                 }
                 catch (Exception)
                 {

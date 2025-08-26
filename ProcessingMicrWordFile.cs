@@ -13,15 +13,13 @@ namespace FindSecretDoc
     internal class ProcessingMicrWordFile : IDisposable
     {
         private string FileName { get; set; }
-        private string Content { get; set; }
 
         private readonly Application Application = new Application();
         private Document Document = new Document();
 
-        public ProcessingMicrWordFile(string fileName, string content)
+        public ProcessingMicrWordFile(string fileName)
         {
             FileName = fileName;
-            Content = content;
         }
 
         /// <summary>

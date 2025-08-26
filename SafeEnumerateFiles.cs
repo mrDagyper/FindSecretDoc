@@ -31,7 +31,6 @@ namespace FindSecretDoc
 
                         foreach (var subdirectory in GetSubdirectories(current))
                         {
-
                             Console.SetCursorPosition(0, 3);
                             Console.Write(new string(' ', LeghtConsole));
                             Console.SetCursorPosition(0, 3);

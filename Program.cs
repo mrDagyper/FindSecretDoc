@@ -11,8 +11,9 @@ namespace FindSecretDoc
         static void Main()
         {
             //*-------------------------ТЕСТ----------------------------------------
-            //MatchingContent matchingContent = new MatchingContent();
-            //matchingContent.MatchingContentForPDF(@"C:\MailUploader\Секретно.pdf");
+            /*string[] content = Settings.SearchPattern;
+            MatchingContent matchingContent = new MatchingContent();
+            matchingContent.MatchingContentForDocx(@"C:\MailUploader\ТакоеСебе.doc", content);*/
             //*=====================================================================
 
             Console.WriteLine("Программа для поиска файлов по названию и содержимому");
@@ -22,7 +23,6 @@ namespace FindSecretDoc
 
             var driveName = DriveInfo.GetDrives();
             List<string> listFilesOut = new List<string>();
-            OperationFiles.searchPattern = "Secretno"; //Переделать на внешний ввод из файла
 
             foreach (var drive in driveName)
             {
@@ -46,10 +46,24 @@ namespace FindSecretDoc
             {
                 Console.WriteLine("Файлы не найдены");
             }
+
+            if (Settings.SearchInName)
+            {
+                Console.WriteLine("=================== Совпадения по имени ==================================");
+                foreach (var SearchOnname in Settings.NameMatches)
+                {
+                    Console.WriteLine(SearchOnname.FullName.ToString());
+                }
+                Console.WriteLine("========================================================================");
+            }
+           
+
+            Console.WriteLine("=================== Совпадения по содержанию ==================================");
             foreach (var item in listFilesOut)
             {
                 Console.WriteLine(item.ToString());
             }
+            Console.WriteLine("===============================================================================");
             Console.WriteLine("Поиск завершен!");
             Console.ReadKey();
         }

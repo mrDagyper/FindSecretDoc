@@ -4,25 +4,29 @@ namespace FindSecretDoc
 {
     public class MatchingName
     {
-        private string Content { get; set; }
 
-        private MatchingName() { }
-        public MatchingName(string content)
-        {
-            Content = content;
-        }
+        public MatchingName() { }
 
         /// <summary>
         /// Поиск соответствий в названии файла
         /// </summary>
         /// <param name="path">Путь к файлу</param>
         /// <returns></returns>
-        public bool FindMatchingInName(string path/*, string searchPattern*/)
+        public bool FindMatchingInName(string path, string[] content)
         {
-            if (!string.IsNullOrWhiteSpace(Content))
-                return path.IndexOf(Content, StringComparison.OrdinalIgnoreCase) >= 0;
-
-            return false;
+            bool result = false;
+            foreach (var item in content)
+            {
+                if (!string.IsNullOrWhiteSpace(item))
+                {
+                    if (path.IndexOf(item, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        result = true;
+                        break;
+                    }
+                }
+            }
+            return result;
         }
     }
 }
