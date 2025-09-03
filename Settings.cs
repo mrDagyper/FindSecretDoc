@@ -20,8 +20,18 @@ namespace FindSecretDoc
             get 
             {
                 var arrSearchPattern = ConfigurationManager.AppSettings["searchPattern"];
+                List<string> strArr = new List<string>();
                 if (arrSearchPattern != null)
-                    return arrSearchPattern.Split(',');
+                {
+                    var strSplit = arrSearchPattern.Split(',');
+                    foreach (var item in strSplit)
+                    {
+                        strArr.Add(" " + item);
+                        strArr.Add(item + " ");
+                    }
+                    return strSplit.ToArray();
+
+                }
                 return null;
             }
         }
@@ -40,11 +50,6 @@ namespace FindSecretDoc
                 return false;
             }
         }
-
-       /* /// <summary>
-        /// Совпадения в наименовании
-        /// </summary>
-        public static List<bool> NameMatches { get; set; }*/
 
     }
 }

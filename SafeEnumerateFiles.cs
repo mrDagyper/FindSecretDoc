@@ -10,43 +10,53 @@ namespace FindSecretDoc
         public static int LeghtConsole = 0;
         public static IEnumerable<FileInfo> EnumerateFiles(this DirectoryInfo target, string pattern = "*.*")
         {
+                var allFiles = Enumerable.Empty<FileInfo>();
             try
             {
-                var allFiles = Enumerable.Empty<FileInfo>();
                 var files = Enumerable.Empty<FileInfo>();
                 var stack = new Stack<DirectoryInfo>();
                 stack.Push(target);
 
                 while (stack.Any())
                 {
-                    var current = stack.Pop();
 
-                    if (current.FullName.Length < 248)
+                    try
                     {
-                        files = OperationFiles.GetAllFiles(GetFiles(current, pattern));
-                        if (files.Any())
-                        {
-                            allFiles = allFiles.Concat(files);
-                        }
+                        var current = stack.Pop();
 
-                        foreach (var subdirectory in GetSubdirectories(current))
+                        if (current.FullName.Length < 248)
                         {
-                            Console.SetCursorPosition(0, 3);
-                            Console.Write(new string(' ', LeghtConsole));
-                            Console.SetCursorPosition(0, 3);
-                            Console.Write(subdirectory.FullName);
-                            LeghtConsole = subdirectory.FullName.Length;
-                            stack.Push(subdirectory);
+                            files = OperationFiles.GetAllFiles(GetFiles(current, pattern));
+                            if (files.Any())
+                            {
+                                allFiles = allFiles.Concat(files);
+                            }
+
+                            foreach (var subdirectory in GetSubdirectories(current))
+                            {
+                                Console.SetCursorPosition(0, 3);
+                                Console.Write(new string(' ', LeghtConsole));
+                                Console.SetCursorPosition(0, 3);
+                                Console.Write(subdirectory.FullName);
+                                LeghtConsole = subdirectory.FullName.Length;
+                                stack.Push(subdirectory);
+                            }
                         }
+                    }
+                    catch (Exception)
+                    {
+                        continue;
                     }
 
                 }
                 return allFiles;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
 
-                throw;
+                //Console.WriteLine(ex.Message);
+                return allFiles;
+                //throw;
             }
 
         }
@@ -60,7 +70,10 @@ namespace FindSecretDoc
                                                                                                (x.Extension.ToLower() == ".doc") ||
                                                                                                 (x.Extension.ToLower() == ".docx") ||
                                                                                                 (x.Extension.ToLower() == ".pdf") ||
-                                                                                               // (x.Extension.ToLower() == ".xml") || Раскоментить если есть в этом необходимость
+                                                                                                /*(x.Extension.ToLower() == ".zip") ||
+                                                                                                (x.Extension.ToLower() == ".rar") ||
+                                                                                                (x.Extension.ToLower() == ".7z") ||*/
+                                                                                                // (x.Extension.ToLower() == ".xml") || Раскоментить если есть в этом необходимость
                                                                                                 (x.Extension.ToLower() == ".rtf")));
             }
             catch (UnauthorizedAccessException)
