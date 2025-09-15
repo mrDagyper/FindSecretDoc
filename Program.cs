@@ -19,25 +19,81 @@ namespace FindSecretDoc
             matchingContent.MatchingContentForDocx(@"C:\MailUploader\ТакоеСебе.doc", content);*/
             //*=====================================================================
 
-            Console.WriteLine("Программа для поиска файлов по названию и содержимому");
-            Console.WriteLine("----------------------------------------------------");
+            StartProgramTextConsole();
+            List<string> listFilesOut = FileIteration();
+            ResultIterationFiles(listFilesOut);
 
-            Console.WriteLine("Идет поиск соответствий. Ожидайте результата.");
+            DateTime dateTime = DateTime.Now;
+            string writeResult = dateTime.ToString("s");
+            writeResult = writeResult.Replace($":", $"-");
+            var baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+            var resultTextFile = baseFolder + "\\" + writeResult + ".txt";
+            var resultFolder = baseFolder + "\\" + writeResult;
+            Directory.CreateDirectory(resultFolder);
 
-            var driveName = DriveInfo.GetDrives();
-            List<string> listFilesOut = new List<string>();
+            Program program = new Program();
 
-            foreach (var drive in driveName)
+            if (Settings.ExitTextFile)
+                System.IO.File.WriteAllText(resultTextFile, program.NameMatchTextConsole() + "\n");
+
+            if (Settings.SearchInName)
             {
-                var listFiles = (EnumerateFiles(drive.Name));
+                if (Settings.ExitTextFile)
+                    Console.WriteLine(program.NameMatchTextConsole());
 
-                foreach (var item in listFiles)
+                foreach (var SearchOnname in Settings.NameMatches)
                 {
-                    listFilesOut.Add(item);
-                }
+                    Console.WriteLine(SearchOnname.FullName.ToString());
 
+                    if (Settings.ExitTextFile)
+                        System.IO.File.AppendAllText(resultTextFile, SearchOnname.FullName + "\n");
+                }
+                Console.WriteLine(program.IntermediateTextConsole());
+
+                if (Settings.ExitTextFile)
+                    System.IO.File.AppendAllText(resultTextFile, program.IntermediateTextConsole() + "\n");
             }
 
+
+            Console.WriteLine(program.ContentMatchTextConsole());
+
+            if (Settings.ExitTextFile)
+                System.IO.File.AppendAllText(resultTextFile, program.ContentMatchTextConsole() + "\n");
+
+            string fulResultFolder = resultFolder + "\\";
+            foreach (var item in listFilesOut)
+            {
+                FileInfo fileInfo = new FileInfo(item);
+                Console.WriteLine(item.ToString());
+
+                if (Settings.ExitTextFile)
+                    System.IO.File.AppendAllText(resultTextFile, item + "\n");
+
+                CreateShortcut(item, fulResultFolder + fileInfo.Name + ".lnk");
+
+            }
+            Console.WriteLine(program.IntermediateTextConsole());
+            Console.WriteLine("Поиск завершен!");
+            if (Settings.ExitTextFile)
+            {
+                System.IO.File.AppendAllText(resultTextFile, program.IntermediateTextConsole() + "\n");
+                System.IO.File.AppendAllText(resultTextFile, "Поиск завершен!");
+            }
+
+
+            if (Settings.ExitTextFile)
+                Process.Start(resultTextFile);
+
+            Process.Start("explorer.exe", resultFolder);
+            Console.ReadKey();
+        }
+
+        /// <summary>
+        /// Результат итерации фйлов
+        /// </summary>
+        /// <param name="listFilesOut">коллекция найденых файлов</param>
+        private static void ResultIterationFiles(List<string> listFilesOut)
+        {
             Console.SetCursorPosition(0, 3);
             Console.Write(new string(' ', SafeEnumerateFiles.LeghtConsole));
             Console.SetCursorPosition(0, 3);
@@ -49,53 +105,34 @@ namespace FindSecretDoc
             {
                 Console.WriteLine("Файлы не найдены");
             }
-
-            DateTime dateTime = DateTime.Now;
-            string writeResult = dateTime.ToString("s");
-            writeResult = writeResult.Replace($":",$"-");
-            var baseFolder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var resultTextFile = baseFolder + "\\" + writeResult + ".txt";
-            var resultFolder = baseFolder + "\\" + writeResult;
-            Directory.CreateDirectory(resultFolder);
-
-
-            System.IO.File.WriteAllText(resultTextFile, "=================== Совпадения по имени ==================================" + "\n");
-
-            if (Settings.SearchInName)
-            {
-                
-                Console.WriteLine("=================== Совпадения по имени ==================================");
-                foreach (var SearchOnname in Settings.NameMatches)
-                {
-                    Console.WriteLine(SearchOnname.FullName.ToString());
-                    System.IO.File.AppendAllText(resultTextFile, SearchOnname.FullName + "\n");
-                }
-                Console.WriteLine("========================================================================");
-                System.IO.File.AppendAllText(resultTextFile, "========================================================================" + "\n");
-            }
-           
-
-            Console.WriteLine("=================== Совпадения по содержанию ==================================");
-            System.IO.File.AppendAllText(resultTextFile, "=================== Совпадения по содержанию ==================================" + "\n");
-
-            string fulResultFolder = resultFolder + "\\";
-            foreach (var item in listFilesOut)
-            {
-                FileInfo fileInfo = new FileInfo(item);
-                Console.WriteLine(item.ToString());
-                System.IO.File.AppendAllText(resultTextFile, item + "\n");
-                CreateShortcut(item, fulResultFolder + fileInfo.Name + ".lnk");
-
-            }
-            Console.WriteLine("===============================================================================");
-            Console.WriteLine("Поиск завершен!");
-            System.IO.File.AppendAllText(resultTextFile, "========================================================================" + "\n");
-            System.IO.File.AppendAllText(resultTextFile, "Поиск завершен!");
-
-            Process.Start(resultTextFile);
-            Process.Start("explorer.exe", resultFolder);
-            Console.ReadKey();
         }
+
+        /// <summary>
+        /// Итерация файлов
+        /// </summary>
+        /// <returns>Коллекция путец к файлам найденых соответствий</returns>
+        private static List<string> FileIteration()
+        {
+            var driveName = DriveInfo.GetDrives();
+            List<string> listFilesOut = new List<string>();
+
+           // foreach (var drive in driveName)
+            //{
+                //var listFiles = (EnumerateFiles(drive.Name)); // закоментить для теста
+                var listFiles = (EnumerateFiles(PathForTest())); //закоментить для боевого режима
+
+                foreach (var item in listFiles)
+                {
+                    listFilesOut.Add(item);
+                }
+
+           // }
+
+            return listFilesOut;
+        }
+
+        private static string PathForTest()
+            => "C:\\MailUploader";
 
         /// <summary>
         /// Возвращает перечисляемую коллекцию имен файлов которые соответствуют шаблону в указанном каталоге, с дополнительным просмотром вложенных каталогов
@@ -122,19 +159,52 @@ namespace FindSecretDoc
             return matchFiles;
         }
 
+        /// <summary>
+        /// Создание ярлыка
+        /// </summary>
+        /// <param name="targetPath">Путь для кого ярлык</param>
+        /// <param name="shortcutPath">путь где будет распологаться ярлык</param>
         static void CreateShortcut(string targetPath, string shortcutPath)
         {
             WshShell shell = new WshShell();
             IWshShortcut shortcut = (IWshShortcut)shell.CreateShortcut(shortcutPath);
 
-            // Set the shortcut properties
             shortcut.TargetPath = targetPath;
-            shortcut.WorkingDirectory = System.IO.Path.GetDirectoryName(targetPath); // Set working directory if needed
-            shortcut.Description = "Shortcut Description"; // Set a description if desired
-                                                           // Other properties you can set: IconLocation, Arguments, WindowStyle, Hotkey, etc.
-
-            // Save the shortcut
+            shortcut.WorkingDirectory = System.IO.Path.GetDirectoryName(targetPath);
+            shortcut.Description = "Shortcut Description";
             shortcut.Save();
+        }
+
+        /// <summary>
+        /// Текстовое начало отображения
+        /// </summary>
+        /// <returns></returns>
+        private string NameMatchTextConsole()
+            => "=================== Совпадения по имени ==================================";
+
+        /// <summary>
+        /// Промежуточный текст (==========)
+        /// </summary>
+        /// <returns></returns>
+        private string IntermediateTextConsole()
+            => "========================================================================";
+
+        /// <summary>
+        /// Текстовое окончание отображения
+        /// </summary>
+        /// <returns></returns>
+        private string ContentMatchTextConsole()
+            => "=================== Совпадения по содержанию ==================================";
+
+        /// <summary>
+        /// Текстовый старт программы
+        /// </summary>
+        private static void StartProgramTextConsole()
+        {
+            Console.WriteLine("Программа для поиска файлов по названию и содержимому");
+            Console.WriteLine("----------------------------------------------------");
+
+            Console.WriteLine("Идет поиск соответствий. Ожидайте результата.");
         }
     }
 }

@@ -51,5 +51,17 @@ namespace FindSecretDoc
             }
         }
 
+        public static bool ExitTextFile
+        {
+            get
+            {
+                string strExitTextFile = ConfigurationManager.AppSettings["exitTextFile"];
+                bool exitTextFile = bool.TryParse(strExitTextFile, out bool ComplParse);
+                if(ComplParse)
+                    return exitTextFile;
+                return false;
+            }
+        }
+
     }
 }

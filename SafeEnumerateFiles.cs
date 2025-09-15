@@ -70,8 +70,8 @@ namespace FindSecretDoc
                                                                                                (x.Extension.ToLower() == ".doc") ||
                                                                                                 (x.Extension.ToLower() == ".docx") ||
                                                                                                 (x.Extension.ToLower() == ".pdf") ||
-                                                                                                /*(x.Extension.ToLower() == ".zip") ||
-                                                                                                (x.Extension.ToLower() == ".rar") ||
+                                                                                                (x.Extension.ToLower() == ".zip") ||
+                                                                                                /*(x.Extension.ToLower() == ".rar") ||
                                                                                                 (x.Extension.ToLower() == ".7z") ||*/
                                                                                                 // (x.Extension.ToLower() == ".xml") || Раскоментить если есть в этом необходимость
                                                                                                 (x.Extension.ToLower() == ".rtf")));
